@@ -1,0 +1,16 @@
+body { width: 340px; margin: 0; font-family: Segoe UI, Arial, sans-serif; background: #f4f6fb; color: #1d2433; }
+header { background: #1f3a93; color: #fff; padding: 14px 16px; font-size: 18px; font-weight: 600; }
+.card { margin: 12px; padding: 14px; border-radius: 10px; background: #fff; border-left: 6px solid #888; }
+.card.safe { border-color: #2e9e5b; }
+.card.suspicious { border-color: #e0a100; }
+.card.dangerous { border-color: #d93025; }
+.card.error { border-color: #888; }
+.verdict { font-size: 20px; font-weight: 700; text-transform: capitalize; }
+.url { font-size: 12px; color: #667; word-break: break-all; margin: 4px 0 8px; }
+.card ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; }
+h3 { margin: 8px 16px 4px; font-size: 13px; color: #556; text-transform: uppercase; letter-spacing: .5px; }
+#history { list-style: none; margin: 0; padding: 0 12px 12px; max-height: 180px; overflow-y: auto; }
+#history li { background: #fff; margin-bottom: 6px; padding: 8px 10px; border-radius: 8px; font-size: 12px; display: flex; gap: 8px; align-items: center; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.dot.safe { background: #2e9e5b; } .dot.suspicious { background: #e0a100; } .dot.dangerous { background: #d93025; }
+.h-url { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
