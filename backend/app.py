@@ -25,6 +25,12 @@ WHITELIST = {
     "codechef.com", "netflix.com", "whatsapp.com", "zoom.us", "paypal.com",
 }
 
+try:
+    with open(os.path.join(BASE, "top_domains.txt")) as f:
+        WHITELIST |= {line.strip().lower() for line in f if line.strip()}
+except FileNotFoundError:
+    pass
+
 app = Flask(__name__)
 CORS(app)
 

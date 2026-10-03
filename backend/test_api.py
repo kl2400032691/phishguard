@@ -7,6 +7,7 @@ tests = [
     ("http://192.168.1.1/login/verify/account", None),
     ("http://secure-update-bankofamerica.verify-login.tk/signin?id=8f3a9c", None),
     ("chrome://extensions", "skipped"),
+    ("https://www.bbc.com/news", "safe"),
 ]
 
 for url, expected in tests:
