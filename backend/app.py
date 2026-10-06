@@ -3,7 +3,7 @@ import joblib
 import pandas as pd
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from features import extract_features, _extract
+from features import extract_features, _extract, HOSTING_PLATFORMS
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 model = joblib.load(os.path.join(BASE, "model.pkl"))
@@ -30,6 +30,8 @@ try:
         WHITELIST |= {line.strip().lower() for line in f if line.strip()}
 except FileNotFoundError:
     pass
+
+WHITELIST -= HOSTING_PLATFORMS   # shared hosting must never be whitelisted
 
 app = Flask(__name__)
 CORS(app)
