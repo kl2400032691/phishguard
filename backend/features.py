@@ -7,8 +7,10 @@ _extract = tldextract.TLDExtract(suffix_list_urls=())
 
 SUSPICIOUS_WORDS = ["login", "verify", "secure", "account", "update", "bank",
                     "signin", "confirm", "password", "webscr", "security", "wallet"]
-SHORTENERS = ["bit.ly", "tinyurl", "goo.gl", "t.co", "ow.ly", "is.gd",
-              "1url.at", "cutt.ly", "rb.gy", "shorturl.at", "tiny.cc"]
+
+SHORTENERS = {"bit.ly", "tinyurl.com", "goo.gl", "t.co", "ow.ly", "is.gd",
+              "1url.at", "cutt.ly", "rb.gy", "shorturl.at", "tiny.cc"}
+
 SUSPICIOUS_TLDS = ["xyz", "top", "tk", "ml", "ga", "cf", "gq", "click", "work",
                    "sbs", "cfd", "icu", "buzz", "cyou", "rest", "monster", "quest"]
 BRANDS = ["facebook", "instagram", "whatsapp", "google", "gmail", "paypal",
@@ -76,7 +78,7 @@ def extract_features(url):
         "host_entropy": _entropy(host),
         "path_depth": len([p for p in path.split("/") if p]),
         "num_suspicious_words": sum(w in lower for w in SUSPICIOUS_WORDS),
-        "is_shortener": int(any(s in host for s in SHORTENERS)),
+        "is_shortener": int(registered in SHORTENERS),
         "suspicious_tld": int(ext.suffix.split(".")[-1] in SUSPICIOUS_TLDS),
         # new features
         "on_hosting_platform": int(registered in HOSTING_PLATFORMS),

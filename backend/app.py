@@ -6,8 +6,8 @@ from flask_cors import CORS
 from features import extract_features, _extract, HOSTING_PLATFORMS
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-model = joblib.load(os.path.join(BASE, "model.pkl"))
-columns = joblib.load(os.path.join(BASE, "feature_columns.pkl"))
+model = joblib.load(os.path.join(BASE, "model_v2.pkl"))
+columns = joblib.load(os.path.join(BASE, "feature_columns_v2.pkl"))
 
 try:
     THRESHOLD = json.load(open(os.path.join(BASE, "threshold.json")))["threshold"]
@@ -58,6 +58,14 @@ def get_reasons(f):
         reasons.append("Domain name looks random")
     if f["num_hyphens"] >= 3:
         reasons.append("Contains many hyphens")
+    if f["brand_in_host_mismatch"]:
+        reasons.append("Uses a famous brand name in a domain that doesn't belong to that brand")
+    if f["on_hosting_platform"]:
+        reasons.append("Hosted on a free website platform often abused for phishing")
+    if f["has_uuid_or_hex"]:
+        reasons.append("Contains a long random ID in the address")
+    if f["brand_in_path_mismatch"]:
+        reasons.append("Mentions a brand name in the path of an unrelated site")
     return reasons
 
 
@@ -88,6 +96,13 @@ def predict():
         feats = extract_features(url)
         X = pd.DataFrame([feats])[columns]          # same column order as training
         score = float(model.predict_proba(X)[0][1])
+
+        # rule layer: a famous brand name + free hosting platform + bait word
+        # is almost always phishing, so never leave it in the yellow zone
+        rule_hit = (feats["brand_in_host_mismatch"] and feats["on_hosting_platform"]
+                    and feats["num_suspicious_words"] >= 1)
+        if rule_hit:
+            score = max(score, THRESHOLD)
 
         if score >= THRESHOLD:
             verdict = "dangerous"

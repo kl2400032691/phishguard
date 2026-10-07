@@ -8,6 +8,9 @@ tests = [
     ("http://secure-update-bankofamerica.verify-login.tk/signin?id=8f3a9c", None),
     ("chrome://extensions", "skipped"),
     ("https://www.bbc.com/news", "safe"),
+    ("https://facebook-new-security.blogspot.com/", "dangerous"),
+    ("https://www.facebook.com/login", "safe"),
+    ("https://facebook-new-security.blogspot.com/", None),
 ]
 
 for url, expected in tests:
