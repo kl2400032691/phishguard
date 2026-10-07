@@ -1,7 +1,7 @@
 const LABELS = {
-  safe: "Safe",
-  suspicious: "Suspicious",
-  dangerous: "Dangerous",
+  safe: "✅ Safe",
+  suspicious: "⚠️ Suspicious",
+  dangerous: "🚫 Dangerous",
   error: "Cannot reach PhishGuard server",
 };
 
@@ -28,10 +28,17 @@ async function init() {
 
     box.append(v, u);
 
-    if (r.verdict !== "error") {
-      const s = document.createElement("div");
-      s.textContent = "Risk score: " + Math.round(r.risk_score * 100) + "%";
-      box.appendChild(s);
+        if (r.verdict !== "error") {
+      const pct = Math.round(r.risk_score * 100);
+      const label = document.createElement("div");
+      label.textContent = "Risk score: " + pct + "%";
+      const meter = document.createElement("div");
+      meter.className = "meter";
+      const fill = document.createElement("div");
+      fill.className = "fill " + r.verdict;
+      fill.style.width = Math.max(pct, 3) + "%";
+      meter.appendChild(fill);
+      box.append(label, meter);
     }
     if (r.reasons && r.reasons.length) {
       const ul = document.createElement("ul");
