@@ -3,6 +3,7 @@ const LABELS = {
   suspicious: "⚠️ Suspicious",
   dangerous: "🚫 Dangerous",
   error: "Cannot reach PhishGuard server",
+  skipped: "Not scanned (local address)",
 };
 
 async function init() {

@@ -1,4 +1,7 @@
 import os, json
+import ipaddress
+from urllib.parse import urlparse
+
 import joblib
 import pandas as pd
 from flask import Flask, request, jsonify
@@ -15,6 +18,10 @@ except FileNotFoundError:
     THRESHOLD = 0.7          # fallback if you skipped saving a threshold
 
 SUSPICIOUS_FROM = THRESHOLD - 0.2   # yellow zone starts here
+
+# Demo mode: set PHISHGUARD_DEMO=1 to scan local addresses too, so the
+# fake-phishing test URLs on 127.0.0.1 trigger the warning page.
+DEMO_MODE = os.environ.get("PHISHGUARD_DEMO") == "1"
 
 # trusted sites are never flagged (matched on the REAL registered domain)
 WHITELIST = {
@@ -35,6 +42,24 @@ WHITELIST -= HOSTING_PLATFORMS   # shared hosting must never be whitelisted
 
 app = Flask(__name__)
 CORS(app)
+
+
+def is_local_address(url):
+    """localhost and private-network addresses can't be public phishing sites."""
+    try:
+        parsed = urlparse(url if "://" in url else "http://" + url)
+        host = (parsed.hostname or "").lower()
+    except ValueError:
+        return False
+    if not host:
+        return False
+    if host == "localhost" or host.endswith((".local", ".localhost")):
+        return True
+    try:
+        ip = ipaddress.ip_address(host)
+        return ip.is_private or ip.is_loopback or ip.is_link_local
+    except ValueError:
+        return False
 
 
 def get_reasons(f):
@@ -71,7 +96,7 @@ def get_reasons(f):
 
 @app.route("/health")
 def health():
-    return jsonify({"status": "ok", "threshold": THRESHOLD})
+    return jsonify({"status": "ok", "threshold": THRESHOLD, "demo_mode": DEMO_MODE})
 
 
 @app.route("/predict", methods=["POST"])
@@ -85,6 +110,11 @@ def predict():
     # skip browser-internal pages like chrome:// or about:blank
     if url.startswith(("chrome://", "chrome-extension://", "about:", "file://", "edge://")):
         return jsonify({"url": url, "verdict": "skipped", "risk_score": 0.0, "reasons": []})
+
+    # skip localhost and private-network addresses (unless demo mode is on)
+    if not DEMO_MODE and is_local_address(url):
+        return jsonify({"url": url, "verdict": "skipped", "risk_score": 0.0,
+                        "reasons": ["Local or private network address"]})
 
     try:
         ext = _extract(url)

@@ -1,6 +1,6 @@
 const API = "http://127.0.0.1:5000/predict";
-const COLORS = { safe: "#2e9e5b", suspicious: "#e0a100", dangerous: "#d93025" };
-const BADGE = { safe: "OK", suspicious: "!", dangerous: "X" };
+const COLORS = { safe: "#2e9e5b", suspicious: "#e0a100", dangerous: "#d93025", skipped: "#888888" };
+const BADGE = { safe: "OK", suspicious: "!", dangerous: "X", skipped: "" };
 
 async function saveHistory(data) {
   const { history = [] } = await chrome.storage.local.get("history");
@@ -30,7 +30,9 @@ async function analyze(tabId, url) {
     await chrome.storage.local.set({ ["result_" + tabId]: data });
     chrome.action.setBadgeText({ tabId, text: BADGE[data.verdict] || "" });
     chrome.action.setBadgeBackgroundColor({ tabId, color: COLORS[data.verdict] || "#888" });
-    await saveHistory(data);
+
+    // local / private-network pages are not scanned, so keep them out of the history
+    if (data.verdict !== "skipped") await saveHistory(data);
 
     if (data.verdict === "suspicious" || data.verdict === "dangerous") {
       chrome.tabs.sendMessage(tabId, { type: "PHISHGUARD_ALERT", data }).catch(() => {});

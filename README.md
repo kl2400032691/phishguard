@@ -27,6 +27,7 @@ The most interesting part of this project is not the model, but what happened wh
 - **Scan history** of the last 20 pages, shown in the popup
 - **Hybrid detection:** ML model, a trusted-domain whitelist, and a narrow rule layer for high-confidence patterns
 - **Privacy-friendly:** URLs are sent only to the API you run on your own machine (`127.0.0.1`), never to a third party
+- **No false alarms on your own projects:** `localhost` and private-network addresses (such as `192.168.x.x`) are skipped automatically
 
 ## Screenshots
 
@@ -63,7 +64,7 @@ flowchart LR
 | Length and counts | URL, host, path, query and domain length; counts of dots, hyphens, underscores, slashes, `?`, `=`, `&`, `%`, digits; digit ratio; path depth |
 | Host structure | IP address instead of a domain, number of subdomains, hyphens in the domain, host entropy (randomness) |
 | Suspicious signals | `@` in the URL, bait words (login, verify, secure...), URL shortener, abused TLDs (`.xyz`, `.tk`, `.sbs`...) |
-| Modern phishing patterns | Brand name in the host or path of an unrelated domain, free hosting platform (blogspot, pages.dev...), UUID or long hex IDs |
+| Modern phishing patterns | Brand name in the host or path of an unrelated domain, free hosting platform (blogspot, pages.dev...), UUID or long hex IDs | 
 
 The URL scheme (`http` vs `https`) is deliberately removed before measuring, so it can't leak into the length counts.
 
@@ -214,12 +215,11 @@ Run the API smoke tests with `python backend/test_api.py`.
 - The brand list and bait words are English-centric.
 - The whitelist trusts popular domains, so it cannot catch phishing hosted *inside* trusted platforms.
 - The test set is limited to 300 phishing URLs, so the exact percentages carry some uncertainty.
-- Local and private-network addresses are currently scored like any other URL.
 - The extension currently talks to a locally run API, so the server must be running.
 
 ## Roadmap
 
-- [ ] Skip localhost and private-network addresses
+- [x] Skip localhost and private-network addresses
 - [ ] Page-content features (for example, password forms that submit to another domain)
 - [ ] SHAP explanations of each prediction
 - [ ] Deploy the API to the cloud (AWS) so the extension works without a local server
