@@ -185,6 +185,7 @@ python app.py
 ```
 
 Check `http://127.0.0.1:5000/health` in your browser.
+Keep this terminal open while you browse. The extension only scans pages while the API is running.
 
 **5. Load the extension**
 
@@ -194,19 +195,32 @@ Check `http://127.0.0.1:5000/health` in your browser.
 
 **6. Try it safely**
 
-Never visit real phishing sites. To see the warning, serve a harmless local page:
+Never visit real phishing sites. To see the warning, use demo mode and a harmless local page. Local addresses are normally skipped, so demo mode turns the skipping off.
 
-```bash
-python -m http.server 8000
+Terminal 1, start the API in demo mode (from the `backend` folder):
+
+```powershell
+$env:PHISHGUARD_DEMO="1"
+python app.py
 ```
 
-Then open `http://127.0.0.1:8000/paypal/webscr/login/verify-account/secure-update/signin.html?id=8f3a9c1d`. The address looks like phishing, so PhishGuard flags it. You can also score any URL as text without opening it:
+(Mac/Linux: `PHISHGUARD_DEMO=1 python app.py`)
+
+Terminal 2, serve an empty folder, only on your own machine:
+
+```bash
+mkdir testpages
+cd testpages
+python -m http.server 8000 --bind 127.0.0.1
+```
+
+Then open `http://127.0.0.1:8000/paypal/webscr/login/verify-account/secure-update/signin.html?id=8f3a9c1d`. The address looks like phishing, so PhishGuard shows the red warning page. You can also score any URL as text without opening it:
 
 ```powershell
 Invoke-RestMethod -Uri http://127.0.0.1:5000/predict -Method Post -ContentType "application/json" -Body '{"url":"http://secure-paypal-login.verify-account.xyz/signin"}'
 ```
 
-Run the API smoke tests with `python backend/test_api.py`.
+Run the API smoke tests with `python backend/test_api.py` (start the API in normal mode, without the demo variable, for these).
 
 ## Limitations
 
