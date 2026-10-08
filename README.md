@@ -230,6 +230,7 @@ Run the API smoke tests with `python backend/test_api.py` (start the API in norm
 - The whitelist trusts popular domains, so it cannot catch phishing hosted *inside* trusted platforms.
 - The test set is limited to 300 phishing URLs, so the exact percentages carry some uncertainty.
 - The extension currently talks to a locally run API, so the server must be running.
+- Legitimate login and sign-up pages with long redirect URLs can be flagged as dangerous, because they resemble phishing pages in the training data.
 
 ## Roadmap
 
